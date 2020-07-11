@@ -133,7 +133,11 @@ pub struct Dice<T: ToUniform<i64>> {
 
 impl<T: ToUniform<i64>> Dice<T> {
     /// If the number of dice to drop exceeds the number of dice being rolled, all rolls will be zero.
-    pub fn new(count: i64, range: T, multiplier: i64, modifier: i64, drop: i64) -> Self {
+    pub fn new(count: i64, range: T, multiplier: i64, modifier: i64, mut drop: i64) -> Self {
+        if drop > count {
+            drop = count;
+        }
+
         Dice {
             count,
             range,
