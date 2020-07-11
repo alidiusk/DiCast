@@ -1,0 +1,45 @@
+"use strict";
+
+let button = document.querySelector("#roll");
+button.addEventListener("click", () => {
+    roll()
+});
+
+let showErrorDialog = (e) => {
+    alert(`Something went wrong!\n\n${e}\n\n${e.stack}`);
+}
+
+function roll() {
+    console.log("Clicked!");
+
+    let input = document.getElementById("input").value;
+
+    fetch("/dice", {
+        method: "post",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ roll: input })
+    })
+    .then((res) => {
+        if (res.status !== 200) {
+            throw new Error(`HTTP ${res.status}`);
+        }
+
+        return res.json();
+    })
+    .then((payload) => {
+        let roll = document.querySelector("#output");
+        if (roll === null) {
+            let roll = document.createElement("p");
+            roll.id = "output";
+            let text = document.createTextNode(payload.roll);
+            roll.appendChild(text);
+            document.querySelector("#container").appendChild(roll);
+        } else {
+            let text = document.createTextNode(payload.roll);
+            roll.replaceChild(text, roll.childNodes[0]);
+        }
+    })
+    .catch(showErrorDialog);
+}
