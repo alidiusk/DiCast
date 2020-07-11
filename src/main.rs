@@ -72,7 +72,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
                 warp::reply::json(&DiceResponse { roll }).into_response()
             } else {
-                "Invalid input".to_string().into_response()
+                http::Response::builder()
+                    .status(422)
+                    .body("Invalid roll.").into_response()
             }
     });
 

@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "outFile": "./templates/main.js.liquid",
+        "allowJs": true,
+        "target": "es6"
+    },
+    "include": [
+        "./ts/*"
+    ]
+}
