@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use liquid::{Object, Template};
 
 use crate::mime::{Mime, MimeAware};

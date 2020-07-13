@@ -8,11 +8,15 @@ use dice::parse::parse_str;
 mod mime;
 mod template;
 
-use crate::template::{compile_templates, serve_template, State};
+// use crate::template::{compile_templates, serve_template, State};
 
 use std::error::Error;
 use std::net::SocketAddr;
-use std::sync::Arc;
+// use std::sync::Arc;
+
+const STATIC_DIR_PATH: &str = "./static/";
+const APP_JS: &str = "./frontend/static/main.js";
+const APP_WASM: &str = "./frontend/static/main_bg.wasm";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -21,41 +25,34 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
     pretty_env_logger::init();
 
-    let templates = compile_templates(&[
-        "./templates/index.html.liquid",
-        "./templates/style.css.liquid",
-        "./templates/main.js.liquid",
-    ])
-    .await?;
-    log::info!("{} templates compiled.", templates.len());
+    // let templates = compile_templates(&[
+    //     "./templates/index.html.liquid",
+    //     "./templates/style.css.liquid",
+    //     // "./templates/main.js.liquid",
+    // ])
+    // .await?;
+    // log::info!("{} templates compiled.", templates.len());
+    //
+    // let state = Arc::new(State::new(templates));
+    //
+    // let _with_state = {
+    //     let filter = warp::filters::any::any().map(move || state.clone());
+    //     move || filter.clone()
+    // };
 
-    let state = Arc::new(State::new(templates));
-
-    let with_state = {
-        let filter = warp::filters::any::any().map(move || state.clone());
-        move || filter.clone()
-    };
-
-    let index = warp::filters::method::get()
-        .and(warp::path::end())
-        .and(with_state())
-        .and_then(|state: Arc<State>| async move {
-            serve_template(&state, "index.html", mime::Mime::Html).await.for_warp()
-    });
-
-    let css = warp::filters::method::get()
-        .and(warp::path!("style.css"))
-        .and(with_state())
-        .and_then(|state: Arc<State>| async move {
-            serve_template(&state, "style.css", mime::Mime::Css).await.for_warp()
-    });
+    let statics = warp::filters::method::get()
+        .and(warp::fs::dir(STATIC_DIR_PATH))
+        .and(warp::path::end());
 
     let js = warp::filters::method::get()
-        .and(warp::path!("main.js"))
-        .and(with_state())
-        .and_then(|state: Arc<State>| async move {
-            serve_template(&state, "main.js", mime::Mime::Js).await.for_warp()
-    });
+        .and(warp::path("main.js"))
+        .and(warp::path::end())
+        .and(warp::fs::file(APP_JS));
+
+    let wasm = warp::filters::method::get()
+        .and(warp::path("main_bg.wasm"))
+        .and(warp::path::end())
+        .and(warp::fs::file(APP_WASM));
 
     let dice = warp::filters::method::post()
         .and(warp::path("dice"))
@@ -80,7 +77,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let addr = "0.0.0.0:3000";
     log::info!("Serving server on {}", addr);
-    warp::serve(index.or(js).or(css).or(dice))
+    warp::serve(statics.or(js).or(wasm).or(dice))
         .run(addr.parse::<SocketAddr>()?)
         .await;
 

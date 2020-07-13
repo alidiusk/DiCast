@@ -1,14 +1,18 @@
+#![allow(dead_code)]
+
 use std::fmt;
 
 const HTML: &str = "text/html; charset=utf-8";
 const CSS: &str = "text/css; charset=utf-8";
 const JS: &str = "text/javascript; charset=utf-8";
+const WASM: &str = "application/wasm; charset=utf-8";
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Mime {
     Html,
     Css,
     Js,
+    Wasm,
 }
 
 impl fmt::Display for Mime {
@@ -17,6 +21,7 @@ impl fmt::Display for Mime {
             Mime::Html => HTML,
             Mime::Css => CSS,
             Mime::Js => JS,
+            Mime::Wasm => WASM,
         };
 
         write!(f, "{}", string)

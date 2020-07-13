@@ -1,0 +1,51 @@
+* {
+    font-family: 'Fira Mono', sans-serif;
+}
+
+#container {
+    height: auto;
+    width: 100%;
+    padding: 1em;
+    margin: 0;
+}
+
+.pure-button {
+    margin-left: 1em;
+}
+
+#dice-select {
+    display: inline-block;
+    line-height: normal;
+    white-space: nowrap;
+    vertical-align: middle;
+    text-align: center;
+
+    font-family: inherit;
+    font-size: 100%;
+    padding: .5em 1em;
+
+    border: none transparent;
+    background-color: #e6e6e6;
+    text-decoration: none;
+    border-radius: 2px;
+}
+
+#dice-input-roll {
+    margin-left: 1em;
+}
+
+p {
+    font-weight: normal;
+}
+
+h1 {
+    font-weight: bold;
+}
+
+label {
+    font-weight: bold;
+}
+
+button {
+    font-weight: bold;
+}
