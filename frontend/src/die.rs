@@ -141,7 +141,8 @@ impl Component for Die {
                     value=&self.roll,
                     placeholder="Roll"
                     oninput=self.link.callback(|e: InputData| Msg::InputRoll(e.value)) />
-                    <button class="pure-button" onclick=self.link.callback(|_| Msg::Roll)>{ "Roll" }</button>
+                    <button class="pure-button pure-button-primary"
+                    onclick=self.link.callback(|_| Msg::Roll)>{ "Roll" }</button>
                     <p class="dice-output">{ &self.output }</p>
                 </label>
             </div>

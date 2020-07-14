@@ -31,15 +31,13 @@ impl DieData {
 #[derive(Clone, PartialEq, Serialize, Deserialize)]
 struct State {
     pub dice: Vec<DieData>,
-    pub current: DieData,
 }
 
 #[derive(Clone, PartialEq, Serialize, Deserialize)]
 pub enum Msg {
     UpdateDie(String, DieData),
-    SelectDie(String),
     NewDie,
-    DeleteDie,
+    DeleteDie(String),
 }
 
 impl Component for App {
@@ -55,9 +53,7 @@ impl Component for App {
             } else {
                 let dice = vec![DieData::new("default", "3x 3d20 *2 +1 s2")];
 
-                let current = dice[0].clone();
-
-                State { dice, current }
+                State { dice }
             }
         };
 
@@ -74,38 +70,14 @@ impl Component for App {
             Msg::UpdateDie(name, data) => {
                 let die = self.state.dice.iter_mut().find(|d| d.name == name).unwrap();
 
-                if *die == self.state.current {
-                    self.state.current = data.clone();
-                }
-
                 *die = data;
-            }
-            Msg::SelectDie(s) => {
-                // we know that there has to be a die with that name here
-                // the event only generates names of existing die
-                let die = self
-                    .state
-                    .dice
-                    .iter()
-                    .find(|d| d.name == s)
-                    .unwrap()
-                    .clone();
-                self.state.current = die;
             }
             Msg::NewDie => {
                 let die = DieData::new("", "");
-                self.state.dice.push(die.clone());
-                self.state.current = die;
+                self.state.dice.push(die);
             }
-            Msg::DeleteDie => {
-                let current = self.state.current.clone();
-                self.state.dice.retain(|d| d != &current);
-                self.state.current = self
-                    .state
-                    .dice
-                    .last()
-                    .unwrap_or(&DieData::new("", ""))
-                    .clone();
+            Msg::DeleteDie(s) => {
+                self.state.dice.retain(|d| d.name != s);
             }
         }
 
@@ -119,45 +91,46 @@ impl Component for App {
     }
 
     fn view(&self) -> Html {
+        // refactor this concurrent code at some point
         html! {
-            <div class="pure-g">
-                <div id="container" class="pure-u-1">
-                    <h1>{ "Dice Roller" }</h1>
-                    <p>
-                    <b><u>{ "Syntax:"}</u></b>{ "{#x}{#}d{#}{*//#}{+/-#}{s#}" }<br/><br/>
-                    {
-                    "[Number of rolls, number of dice, number of sides, multiplier,
-                    modifier, number of dice to drop.]"
-                    }
-                    </p>
-                    <select id="dice-select" name="dice" value=&self.state.current.name
-                    onchange=self.link.callback(|cd: ChangeData| {
-                        match cd {
-                            ChangeData::Select(s) => Msg::SelectDie(s.value()),
-                            _ => unreachable!(),
-                        }
-                    }) >
-                    {
-                        self.state.dice.iter().map(|d| html! {
-                            <option value=&d.name>{ &d.name }</option>
-                        })
-                        .collect::<Html>()
-                    }
-                    </select>
-                    <button id="new-die-button" class="pure-button pure-button-primary"
-                    onclick=self.link.callback(|_| Msg::NewDie)>{ "New die" }</button>
-                    <button id="delete-die-button" class="pure-button pure-button-primary"
-                    onclick=self.link.callback(|_| Msg::DeleteDie)>{ "Delete current die" }</button>
-                    <br/><br/>
-                    <div id="dice">
-                        <Die
-                        name=&self.state.current.name
-                        roll=&self.state.current.roll
-                        output={ "".to_string() },
-                        onsignal=self.link.callback(|(name, new_die)| Msg::UpdateDie(name, new_die)) />
-                    </div>
+        <div class="pure-g">
+            <div id="container" class="pure-u-1">
+                <h1>{ "Dice Roller" }</h1>
+                <p>
+                <b><u>{ "Syntax:"}</u></b>{ "{#x}{#}d{#}{*//#}{+/-#}{s#}" }<br/><br/>
+                {
+                "[Number of rolls, number of dice, number of sides, multiplier,
+                modifier, number of dice to drop.]"
+                }
+                </p>
+                <button id="new-die-button" class="pure-button"
+                onclick=self.link.callback(|_| Msg::NewDie)>{ "New die" }</button>
+                <br/><br/>
+                <div id="dice">
+                {
+                    (0..self.state.dice.len()).map(|index| {
+                        let dice_name = self.state.dice[index].name.clone();
+
+                        html! {
+                            <div class="die-row">
+                            <button
+                            class="delete-die-button pure-button button-red"
+                            onclick=self.link.callback(move |_|
+                                Msg::DeleteDie((&dice_name).to_string()))>
+                            { "Delete" }</button>
+
+                            <Die
+                            name=&self.state.dice[index].name
+                            roll=&self.state.dice[index].roll
+                            output={ "".to_string() },
+                            onsignal=self.link.callback(|(name, new_die)|
+                                Msg::UpdateDie(name, new_die)) />
+                            </div>
+                    }}).collect::<Html>()
+                }
                 </div>
             </div>
+        </div>
         }
     }
 }

@@ -9,25 +9,27 @@
     margin: 0;
 }
 
-.pure-button {
+.die {
+    display: inline-block;
+}
+
+.die .pure-button {
     margin-left: 1em;
 }
 
-#dice-select {
-    display: inline-block;
-    line-height: normal;
-    white-space: nowrap;
-    vertical-align: middle;
-    text-align: center;
+.die input {
+    margin-left: 1em;
+}
 
-    font-family: inherit;
-    font-size: 100%;
-    padding: .5em 1em;
+/* https://purecss.io/buttons/ */
+.button-red {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
 
-    border: none transparent;
-    background-color: #e6e6e6;
-    text-decoration: none;
-    border-radius: 2px;
+.button-red {
+    background: rgb(202, 60, 60);
 }
 
 #dice-input-roll {
