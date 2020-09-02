@@ -6,7 +6,6 @@ use dice::dice::DiceRoller;
 use dice::parse::parse_str;
 
 mod mime;
-mod template;
 
 // use crate::template::{compile_templates, serve_template, State};
 
