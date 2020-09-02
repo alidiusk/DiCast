@@ -96,18 +96,27 @@ impl Component for Die {
 
                 self.name = s;
 
-                self.onsignal
-                    .emit((former_name, DieData::new(&self.name, &self.roll)));
+                self.onsignal.emit((
+                    former_name,
+                    DieData::new(&self.name, &self.roll, &self.output),
+                ));
             }
             Msg::InputRoll(s) => {
                 self.roll = s;
 
-                self.onsignal
-                    .emit((self.name.clone(), DieData::new(&self.name, &self.roll)));
+                self.onsignal.emit((
+                    self.name.clone(),
+                    DieData::new(&self.name, &self.roll, &self.output),
+                ));
             }
             Msg::Output(s) => {
                 self.fetch_task = None;
-                self.output = s
+                self.output = s;
+
+                self.onsignal.emit((
+                    self.name.clone(),
+                    DieData::new(&self.name, &self.roll, &self.output),
+                ));
             }
             Msg::FetchFailed => {
                 self.fetch_task = None;
@@ -127,25 +136,23 @@ impl Component for Die {
 
     fn view(&self) -> Html {
         html! {
-            <div class="die">
-                <label>
-                    <input
-                    type="text",
-                    class="dice-input-name",
-                    value=&self.name,
-                    placeholder="Name"
-                    oninput=self.link.callback(|e: InputData| Msg::InputName(e.value)) />
-                    <input
-                    type="text",
-                    class="dice-input-roll",
-                    value=&self.roll,
-                    placeholder="Roll"
-                    oninput=self.link.callback(|e: InputData| Msg::InputRoll(e.value)) />
-                    <button class="pure-button pure-button-primary"
-                    onclick=self.link.callback(|_| Msg::Roll)>{ "Roll" }</button>
-                    <p class="dice-output">{ &self.output }</p>
-                </label>
-            </div>
+            <>
+                <input
+                type="text",
+                class="dice-input-name",
+                value=&self.name,
+                placeholder="Name"
+                oninput=self.link.callback(|e: InputData| Msg::InputName(e.value)) />
+                <input
+                type="text",
+                class="dice-input-roll",
+                value=&self.roll,
+                placeholder="Roll"
+                oninput=self.link.callback(|e: InputData| Msg::InputRoll(e.value)) />
+                <button
+                onclick=self.link.callback(|_| Msg::Roll)>{ "Roll" }</button>
+                <p class="dice-output">{ &self.output }</p>
+            </>
         }
     }
 }

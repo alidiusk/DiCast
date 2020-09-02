@@ -17,13 +17,15 @@ pub struct App {
 pub struct DieData {
     pub name: String,
     pub roll: String,
+    pub output: String,
 }
 
 impl DieData {
-    pub fn new(name: &str, roll: &str) -> Self {
+    pub fn new(name: &str, roll: &str, output: &str) -> Self {
         DieData {
             name: name.to_string(),
             roll: roll.to_string(),
+            output: output.to_string(),
         }
     }
 }
@@ -51,7 +53,7 @@ impl Component for App {
             if let Json(Ok(state)) = storage.restore(KEY) {
                 state
             } else {
-                let dice = vec![DieData::new("default", "3x 3d20 *2 +1 s2")];
+                let dice = vec![DieData::new("default", "3x 3d20 *2 +1 s2", "")];
 
                 State { dice }
             }
@@ -73,7 +75,7 @@ impl Component for App {
                 *die = data;
             }
             Msg::NewDie => {
-                let die = DieData::new("", "");
+                let die = DieData::new("", "", "");
                 self.state.dice.push(die);
             }
             Msg::DeleteDie(s) => {
@@ -93,42 +95,39 @@ impl Component for App {
     fn view(&self) -> Html {
         // refactor this concurrent code at some point
         html! {
-        <div class="pure-g">
-            <div id="container" class="pure-u-1">
-                <h1>{ "Dice Roller" }</h1>
-                <p>
-                <b><u>{ "Syntax:"}</u></b>{ "{#x}{#}d{#}{*//#}{+/-#}{s#}" }<br/><br/>
-                {
-                "[Number of rolls, number of dice, number of sides, multiplier,
-                modifier, number of dice to drop.]"
-                }
-                </p>
-                <button id="new-die-button" class="pure-button"
-                onclick=self.link.callback(|_| Msg::NewDie)>{ "New die" }</button>
-                <br/><br/>
-                <div id="dice">
-                {
-                    (0..self.state.dice.len()).map(|index| {
-                        let dice_name = self.state.dice[index].name.clone();
+        <div id="grid">
+            <h1>{ "Dice Roller" }</h1>
+            <p>
+            <b><u>{ "Syntax:"}</u></b>{ "{#x}{#}d{#}{*//#}{+/-#}{s#}" }<br/><br/>
+            {
+            "[Number of rolls, number of dice, number of sides, multiplier,
+            modifier, number of dice to drop.]"
+            }
+            </p>
+            <button id="new-die-button"
+            onclick=self.link.callback(|_| Msg::NewDie)>{ "New die" }</button>
+            <div id="dice">
+            {
+                (0..self.state.dice.len()).map(|index| {
+                    let dice_name = self.state.dice[index].name.clone();
 
-                        html! {
-                            <div class="die-row">
-                            <button
-                            class="delete-die-button pure-button button-red"
-                            onclick=self.link.callback(move |_|
-                                Msg::DeleteDie((&dice_name).to_string()))>
-                            { "Delete" }</button>
+                    html! {
+                        <div class="die">
+                        <button
+                        class="delete-die-button"
+                        onclick=self.link.callback(move |_|
+                            Msg::DeleteDie((&dice_name).to_string()))>
+                        { "Delete" }</button>
 
-                            <Die
-                            name=&self.state.dice[index].name
-                            roll=&self.state.dice[index].roll
-                            output={ "".to_string() },
-                            onsignal=self.link.callback(|(name, new_die)|
-                                Msg::UpdateDie(name, new_die)) />
-                            </div>
-                    }}).collect::<Html>()
-                }
-                </div>
+                        <Die
+                        name=&self.state.dice[index].name
+                        roll=&self.state.dice[index].roll
+                        output=&self.state.dice[index].output,
+                        onsignal=self.link.callback(|(name, new_die)|
+                            Msg::UpdateDie(name, new_die)) />
+                        </div>
+                }}).collect::<Html>()
+            }
             </div>
         </div>
         }

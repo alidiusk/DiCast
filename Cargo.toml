@@ -1,5 +1,5 @@
 [package]
-name = "dnd_utils"
+name = "dice_roller"
 version = "0.1.0"
 authors = ["liam"]
 edition = "2018"
