@@ -1,5 +1,5 @@
 [package]
-name = "dice_roller"
+name = "dicast"
 version = "0.1.0"
 authors = ["liam"]
 edition = "2018"

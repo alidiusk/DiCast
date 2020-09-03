@@ -141,15 +141,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dice"
-version = "0.1.0"
-dependencies = [
- "rand 0.7.3",
- "thiserror",
-]
-
-[[package]]
-name = "dice_roller"
+name = "dicast"
 version = "0.1.0"
 dependencies = [
  "dice",
@@ -164,6 +156,14 @@ dependencies = [
  "thiserror",
  "tokio",
  "warp",
+]
+
+[[package]]
+name = "dice"
+version = "0.1.0"
+dependencies = [
+ "rand 0.7.3",
+ "thiserror",
 ]
 
 [[package]]

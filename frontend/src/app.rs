@@ -96,7 +96,7 @@ impl Component for App {
         // refactor this concurrent code at some point
         html! {
         <div id="grid">
-            <h1>{ "Dice Roller" }</h1>
+            <h1>{ "DiCast" }</h1>
             <p>
             <b><u>{ "Syntax:"}</u></b>{ "{#x}{#}d{#}{*//#}{+/-#}{s#}" }<br/><br/>
             {
