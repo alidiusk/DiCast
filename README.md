@@ -1,6 +1,6 @@
 # Dice Roller
 
-![Demo of Dice Roller](demo.webm)
+![Demo of Dice Roller](demo.gif)
 
 This is a dice roller web application designed for use in games such as DND. It allows users to create a list of dice, with their names and corresponding dice roll specification.
 
