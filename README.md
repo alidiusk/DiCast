@@ -1,4 +1,4 @@
-# Dice Roller
+# DiCast
 
 ![Demo of Dice Roller](demo.gif)
 
